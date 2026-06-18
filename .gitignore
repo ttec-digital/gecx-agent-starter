@@ -1,0 +1,22 @@
+# Local environment config - never commit (contains project ids / settings)
+config/config.json
+
+# Personal Claude Code overrides (absolute paths, accounts, opt-in hooks)
+.claude/settings.local.json
+
+# Python runtime artifacts
+__pycache__/
+*.pyc
+
+# Credentials / tokens
+*.token
+*-key.json
+service-account*.json
+.env
+.env.*
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

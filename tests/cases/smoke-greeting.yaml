@@ -1,0 +1,21 @@
+# Harness self-test against the `mock` transport - proves case loading, variables, assertions
+# and reporting work without a live agent. The live agent is covered by hello-world.yaml.
+name: smoke-greeting
+description: Mock agent greets the user (by name when provided) and offers help.
+transport: mock
+
+session:
+  variables:
+    customer_name: "Sam"
+
+turns:
+  - user: "Hi there"
+    expect:
+      - contains: "Sam"          # mock greets by the customer_name variable
+      - regex: "help|assist"
+      - latency_ms_max: 2000
+
+  - user: "What's the status of my order?"
+    expect:
+      - regex: "(shipped|in transit|delivered)"
+      - not_contains: "error"

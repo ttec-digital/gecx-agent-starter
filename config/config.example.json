@@ -1,0 +1,8 @@
+{
+  "projectId": "YOUR_GCP_PROJECT_ID",
+  "location": "global",
+  "endpoint": "https://ces.googleapis.com",
+  "apiVersion": "v1",
+  "appId": "",
+  "authAccount": ""
+}

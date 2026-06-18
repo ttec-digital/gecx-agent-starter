@@ -1,0 +1,8 @@
+# RPC test harness dependencies
+PyYAML>=6.0            # test case parsing
+google-auth>=2.0       # ADC bearer tokens for the gRPC channel
+
+# Needed once the live gRPC transports are wired (unary.py / bidi.py).
+# Kept here so `pip install -r` prepares the full environment.
+grpcio>=1.60
+grpcio-tools>=1.60     # to generate SessionService stubs from .proto if no client lib exists

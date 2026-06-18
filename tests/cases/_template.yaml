@@ -1,0 +1,34 @@
+# Test case template — copy this file (drop the leading underscore) to add a case.
+# Files beginning with "_" are ignored by the runner.
+# Full schema reference: docs/testing.md
+
+name: my-case-name              # REQUIRED, unique across all cases
+description: One line on what this case proves.
+
+# Optional. Omit to use the default transport from config (testing.transport).
+# transport: unary              # unary | bidi | mock
+
+session:
+  variables:                    # data variables handed to the agent at session start
+    customer_id: "C-0000"
+    channel: "web"
+
+turns:
+  - user: "Hello"
+    expect:
+      - contains: "help"        # case-insensitive substring match
+      - latency_ms_max: 5000
+
+  - user: "Where is my order?"
+    expect:
+      - regex: "(shipped|in transit|delivered)"
+      - not_contains: "error"
+      # Activated once SessionOutput parsing is confirmed (see docs/testing.md):
+      # - tool_called: get_order_status
+      # - transferred_to: escalation_agent
+      # - escalated: false
+
+# Optional end-of-conversation checks.
+final:
+  expect:
+    - no_validation_errors: true

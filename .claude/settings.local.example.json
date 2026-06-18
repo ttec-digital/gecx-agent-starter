@@ -1,0 +1,24 @@
+{
+  "_comment": "OPT-IN example. Copy to .claude/settings.local.json (gitignored) and replace <ABSOLUTE_PATH_TO_REPO> with this repo's absolute path. See docs/auth-hook.md. This runs scripts/check-auth.ps1 at each session start to confirm your gcloud auth.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": [
+              "-NoProfile",
+              "-ExecutionPolicy",
+              "Bypass",
+              "-File",
+              "<ABSOLUTE_PATH_TO_REPO>/scripts/check-auth.ps1"
+            ],
+            "statusMessage": "Checking gcloud auth",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+# Live end-to-end case: drives the real root agent over REST runSession (unary transport).
+# This is the "hello world" regression test - run it after major changes to the agent.
+name: hello-world
+description: The live root agent greets the user, offers help, and answers a simple question.
+transport: unary
+
+session:
+  variables:
+    customer_name: "Sam"      # seeded as a session variable on the first turn
+
+turns:
+  - user: "Hi there!"
+    expect:
+      - regex: "(hello|hi|hey)"
+      - regex: "(help|assist)"
+      - not_contains: "error"
+      - latency_ms_max: 8000
+
+  - user: "What is 2 + 2?"
+    expect:
+      - contains: "4"
+      - latency_ms_max: 8000
