@@ -8,7 +8,7 @@ from .base import Transport, TurnResult
 
 
 def get_transport(name: str, config) -> Transport:
-    """Factory: return a transport instance by name (unary | bidi | mock)."""
+    """Factory: return a transport instance by name (mock | unary | stream)."""
     name = (name or "").lower()
     if name == "mock":
         from .mock import MockTransport
@@ -18,11 +18,11 @@ def get_transport(name: str, config) -> Transport:
         from .unary import UnaryTransport
 
         return UnaryTransport(config)
-    if name == "bidi":
-        from .bidi import BidiTransport
+    if name == "stream":
+        from .stream import StreamTransport
 
-        return BidiTransport(config)
-    raise ValueError(f"Unknown transport {name!r}. Use one of: mock, unary, bidi.")
+        return StreamTransport(config)
+    raise ValueError(f"Unknown transport {name!r}. Use one of: mock, unary, stream.")
 
 
 __all__ = ["Transport", "TurnResult", "get_transport"]

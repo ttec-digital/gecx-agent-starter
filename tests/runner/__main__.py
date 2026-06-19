@@ -27,7 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--case", help="Run only the case with this name.")
     parser.add_argument(
         "--transport",
-        choices=["mock", "unary", "bidi"],
+        choices=["mock", "unary", "stream"],
         help="Override transport for all cases (default: per-case, else config).",
     )
     parser.add_argument("--config", help="Path to config json (default: config/config.json).")

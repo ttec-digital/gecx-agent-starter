@@ -93,14 +93,20 @@ budget). Secrets stay out of cases — auth is via ADC (`gcloud`), see
 
 ## Transport status
 - ✅ **`mock`** — runnable with no live app (harness self-test).
-- ✅ **`unary`** — **live over REST `runSession`**. Validates the real agent; sends `text` and
-  seeds session `variables`. Contract documented in [api-reference.md](api-reference.md#runsession--confirmed-live-contract).
-- 🟡 **`bidi`** — `streamRunSession` over gRPC. Still a skeleton (`TODO(confirm)` in
-  [`bidi.py`](../tests/runner/transports/bidi.py)). The REST host is `ces.googleapis.com`, so the
-  gRPC target is almost certainly `ces.googleapis.com:443`; the stub still needs sourcing
-  (published client lib vs. generate from `.proto`).
+- ✅ **`unary`** — **live over REST `runSession`** (stdlib only). Sends `text`, seeds session
+  `variables`. Contract: [api-reference.md](api-reference.md#runsession--confirmed-live-contract).
+- ✅ **`stream`** — **live over gRPC `stream_run_session`** (server-streaming) via the official
+  `google-cloud-ces` client. Streams partial text chunks; same multi-turn + variables model.
+- ⛔ **true bidi** (`bidi_run_session`) is **not served** at `ces.googleapis.com` for this
+  project/`eu` location — it returns HTTP **404** (vs. the 403 the other methods give, so it's a
+  real availability gap, not auth). See [ADR-002](../design/decisions/ADR-002-streaming-transport.md).
+
+## Auth note
+The harness uses **ADC** (`google.auth.default`), a *separate* store from gcloud's active account.
+`get_access_token()` verifies the token identity matches `authAccount` and fails loudly on a
+mismatch; `scripts/check-auth.ps1` checks **both** stores. See [authentication.md](authentication.md).
 
 ## Still open
-- [ ] Wire `bidi` (streaming + future audio) once we need streaming behaviour.
-- [ ] Parse `diagnosticInfo` to populate the `tool_called` / `transferred_to` / `escalated`
-      assertions (the data is in `outputs[].diagnosticInfo.messages`).
+- [ ] Parse `SessionOutput.tool_calls` / `diagnosticInfo` to populate the `tool_called` /
+      `transferred_to` / `escalated` assertions (the data is already returned).
+- [ ] Revisit true `bidi_run_session` if/when it's enabled (needed for realtime audio).

@@ -1,8 +1,12 @@
 <#
 .SYNOPSIS
-  Verifies the active gcloud account and token before working against the CES API.
-  If config 'authAccount' is set, enforces that exact account; otherwise just checks a token
-  is available. Designed as an OPT-IN SessionStart hook - see docs/auth-hook.md.
+  Verifies BOTH gcloud credential stores this project uses are the expected account
+  (config 'authAccount') with usable tokens:
+    - gcloud ACTIVE account  -> used by the REST/curl scripts (gcloud auth print-access-token)
+    - Application Default Credentials (ADC) -> used by the Python harness (google.auth.default)
+  The ADC check matters: it is a SEPARATE store, and a mismatch there silently sends harness
+  calls as the wrong identity (exactly the bug this guards against). Opt-in SessionStart hook;
+  see docs/auth-hook.md.
 
 .NOTES
   ASCII-only on purpose (Windows PowerShell 5.1 misreads UTF-8-without-BOM).
@@ -15,28 +19,32 @@ $configPath = Join-Path $repoRoot "config/config.json"
 if (-not (Test-Path $configPath)) { $configPath = Join-Path $repoRoot "config/config.example.json" }
 $expected = (Get-Content $configPath -Raw | ConvertFrom-Json).authAccount
 
-$active = (gcloud config get-value account 2>$null | Out-String).Trim()
+function Get-TokenEmail($token) {
+    if ([string]::IsNullOrWhiteSpace($token)) { return $null }
+    try { return (Invoke-RestMethod -Uri "https://oauth2.googleapis.com/tokeninfo?access_token=$token").email }
+    catch { return $null }
+}
 
+$active    = (gcloud config get-value account 2>$null | Out-String).Trim()
+$activeTok = (gcloud auth print-access-token 2>$null | Out-String).Trim()
+$adcTok    = (gcloud auth application-default print-access-token 2>$null | Out-String).Trim()
+$adcEmail  = Get-TokenEmail $adcTok
+
+$problems = @()
 if ([string]::IsNullOrWhiteSpace($expected)) {
-    # No specific account configured - just confirm a usable token exists.
-    $null = (gcloud auth print-access-token 2>$null)
-    if ($LASTEXITCODE -ne 0) {
-        Write-Output "[AUTH REMINDER] No active gcloud token. Run: gcloud auth login   (set 'authAccount' in config/config.json to enforce a specific account)."
-    } else {
-        Write-Output "[AUTH OK] gcloud token valid for '$active'. (Set 'authAccount' in config/config.json to enforce a specific account.)"
-    }
-    exit 0
-}
-
-if ($active -ne $expected) {
-    Write-Output "[AUTH REMINDER] Active gcloud account is '$active' (expected '$expected'). Switch with: gcloud config set account $expected   (then 'gcloud auth login $expected' if the token is stale)."
-    exit 0
-}
-
-$null = (gcloud auth print-access-token 2>$null)
-if ($LASTEXITCODE -ne 0) {
-    Write-Output "[AUTH REMINDER] Signed in as $expected but the access token needs a refresh. Run: gcloud auth login $expected"
+    if (-not $activeTok) { $problems += "no active gcloud token (run: gcloud auth login)" }
+    if (-not $adcTok)    { $problems += "no ADC token (run: gcloud auth application-default login)" }
 } else {
-    Write-Output "[AUTH OK] gcloud active account is $expected and the access token is valid."
+    if ($active -ne $expected)  { $problems += "ACTIVE account is '$active', expected '$expected' (gcloud config set account $expected)" }
+    elseif (-not $activeTok)    { $problems += "ACTIVE token stale (gcloud auth login $expected)" }
+    if ($adcEmail -and $adcEmail -ne $expected) { $problems += "ADC account is '$adcEmail', expected '$expected' (gcloud auth application-default login $expected)" }
+    elseif (-not $adcTok)       { $problems += "ADC token stale/missing (gcloud auth application-default login $expected)" }
+}
+
+if ($problems.Count -gt 0) {
+    Write-Output ("[AUTH REMINDER] " + ($problems -join "  |  "))
+} else {
+    if ([string]::IsNullOrWhiteSpace($expected)) { $who = "active '$active' / ADC '$adcEmail'" } else { $who = "'$expected'" }
+    Write-Output "[AUTH OK] gcloud active + ADC both $who with valid tokens."
 }
 exit 0

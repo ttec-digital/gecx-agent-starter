@@ -1,8 +1,10 @@
 # RPC test harness dependencies
-PyYAML>=6.0            # test case parsing
-google-auth>=2.0       # ADC bearer tokens for the gRPC channel
+PyYAML>=6.0              # test case parsing
 
-# Needed once the live gRPC transports are wired (unary.py / bidi.py).
-# Kept here so `pip install -r` prepares the full environment.
-grpcio>=1.60
-grpcio-tools>=1.60     # to generate SessionService stubs from .proto if no client lib exists
+# CES (Customer Engagement Suite) official client - provides the google.cloud.ces_v1
+# SessionService stubs used by the `stream` transport (stream_run_session). It pulls in
+# google-auth, grpcio, proto-plus and protobuf.
+google-cloud-ces>=0.7
+
+# Note: the `unary` transport calls runSession over REST using only the stdlib + a bearer token,
+# so PyYAML + google-auth alone are enough for it. google-cloud-ces is required for `stream`.

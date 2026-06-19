@@ -1,0 +1,22 @@
+# Live case over server-streaming (stream_run_session). Exercises the streaming path and
+# variable seeding. True bidi (bidi_run_session) is not served for this project/location (404).
+name: hello-world-stream
+description: The live root agent greets and answers, delivered over server-streaming.
+transport: stream
+
+session:
+  variables:
+    customer_name: "Sam"
+
+turns:
+  - user: "Hi there!"
+    expect:
+      - regex: "(hello|hi|hey)"
+      - regex: "(help|assist)"
+      - not_contains: "error"
+      - latency_ms_max: 10000
+
+  - user: "Give me a one-sentence fun fact about the moon."
+    expect:
+      - contains: "moon"
+      - latency_ms_max: 10000

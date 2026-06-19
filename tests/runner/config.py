@@ -26,6 +26,7 @@ class Config:
     endpoint: str
     api_version: str
     app_id: str
+    auth_account: str = ""        # expected gcloud/ADC identity; verified by auth.get_access_token
     testing: TestingDefaults = field(default_factory=TestingDefaults)
 
     @property
@@ -49,9 +50,10 @@ def load_config(path: Path | None = None) -> Config:
     return Config(
         project_id=raw.get("projectId", ""),
         location=raw.get("location", "global"),
-        endpoint=raw.get("endpoint", "https://dialogflow.googleapis.com"),
+        endpoint=raw.get("endpoint", "https://ces.googleapis.com"),
         api_version=raw.get("apiVersion", "v1"),
         app_id=raw.get("appId", ""),
+        auth_account=raw.get("authAccount", ""),
         testing=TestingDefaults(
             transport=testing_raw.get("transport", "unary"),
             latency_ms_max=testing_raw.get("latencyMsMax"),

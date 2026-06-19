@@ -34,7 +34,7 @@ class UnaryTransport:
         session_id = f"test-{uuid.uuid4().hex[:12]}"
         self._session_name = f"{app_path}/sessions/{session_id}"
         self._pending_variables = dict(variables)
-        self._token = auth.get_access_token()
+        self._token = auth.get_access_token(self.config.auth_account)
 
     def send_turn(self, text: str) -> TurnResult:
         if not self._session_name:
