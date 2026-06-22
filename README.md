@@ -5,6 +5,10 @@ that runs as a **CX Agent Studio** agent. It pairs a clean, source-of-truth fold
 distilled platform docs, a connectivity smoke test, and an **RPC test harness** — so you can focus
 on designing and validating your agent instead of scaffolding.
 
+> **📋 This is a GitHub _template repository_.** Click **"Use this template" → "Create a new
+> repository"** to start a new agent project with a clean history (don't fork or clone this one
+> directly). Full walkthrough: [Using this template](#using-this-template).
+>
 > **Status:** 🟢 Working "hello world" agent, validated end-to-end by the RPC harness over live
 > `runSession`. Use it as a worked example; define your own agent in
 > [`design/agent-design.md`](design/agent-design.md).
@@ -65,7 +69,7 @@ See [`docs/api-reference.md`](docs/api-reference.md) for the full resource map.
 │
 ├── tests/                    # RPC test harness (validate the agent)
 │   ├── cases/                # test cases as YAML data (one convo per file)
-│   ├── runner/               # modular Python runner (mock | unary | bidi)
+│   ├── runner/               # modular Python runner (mock | unary | stream)
 │   └── requirements.txt
 │
 └── .claude/
@@ -75,6 +79,26 @@ See [`docs/api-reference.md`](docs/api-reference.md) for the full resource map.
 > **Source-of-truth strategy.** Keep resource definitions as JSON under `app/` so changes are
 > reviewable and diff-able. The platform also supports `exportApp` / `importApp` (a full app
 > snapshot) — use those for backup and bulk sync. See [`docs/api-reference.md`](docs/api-reference.md).
+
+---
+
+## Using this template
+
+This repository is a **GitHub template**, so every new agent project starts from a clean copy:
+
+1. On GitHub, click **"Use this template" → "Create a new repository."** Name it for your agent
+   (convention: `gecx-<purpose>-agent`) and choose **Private** to start.
+2. **Clone your new repo** locally (not this template): `git clone https://github.com/<org>/<your-new-repo>.git`
+3. Continue with [Getting started](#getting-started) — authenticate, copy `config.example.json` →
+   `config.json`, fill in your project details, and run the smoke test.
+
+You start from a clean, working baseline: a throwaway **"hello world"** agent as a worked example,
+the RPC test harness, and distilled platform docs. Personal config is **not** carried over —
+`config/config.json` and `.claude/settings.local.json` are gitignored — so define your own agent in
+[`design/agent-design.md`](design/agent-design.md) and fill in your own environment.
+
+> **Maintainers:** to (re)mark a repo as a template, run `gh repo edit <org>/<repo> --template`
+> (or GitHub → *Settings* → check *Template repository*).
 
 ---
 
