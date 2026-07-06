@@ -175,6 +175,11 @@ body: { "instruction": "You are a friendly assistant ..." }
 ```
 `instruction` is a **top-level** field on the agent (default agent type is LlmAgent).
 
+> **Scripted push/export.** You rarely need to run these PATCHes by hand — `scripts/push-app.ps1`
+> pushes every `app/*.json` (dry-run by default, `-Apply` to write; strips read-only fields, builds
+> the `updateMask`), and `scripts/export-app.ps1` refreshes `app/*.json` from the live app. See
+> [`../app/README.md`](../app/README.md). The manual recipe above is the underlying contract.
+
 ## Long-running operations
 
 Mutating calls may return an `operation`; poll

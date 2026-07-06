@@ -65,6 +65,9 @@ See [`docs/api-reference.md`](docs/api-reference.md) for the full resource map.
 ├── scripts/                  # Helper scripts for API operations
 │   ├── smoke-test.ps1        # Verifies auth + connectivity (lists apps)
 │   ├── run-tests.ps1         # Runs the RPC regression harness (gate after changes)
+│   ├── push-app.ps1          # Push app/*.json to the platform (dry-run by default, -Apply to write)
+│   ├── export-app.ps1        # Refresh app/*.json from the live app (reverse of push)
+│   ├── call-report.ps1       # Per-call CES conversation trace / report
 │   └── check-auth.ps1        # Optional auth check (see docs/auth-hook.md)
 │
 ├── tests/                    # RPC test harness (validate the agent)
