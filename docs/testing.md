@@ -16,7 +16,8 @@ Start with the harness; add platform evaluations once the agent stabilizes.
 
 Drives the agent over `google.cloud.ces.v1.SessionService`:
 - **`runSession`** (unary) — default while we make **text** rock-solid.
-- **`streamRunSession`** (bidi) — production path; carries streaming + future audio.
+- **`streamRunSession`** (`stream`) — live server-streaming path; carries streaming + future audio.
+  (True `bidi_run_session` is not served here — see [ADR-002](../design/decisions/ADR-002-streaming-transport.md).)
 - **`mock`** — canned responses; lets us exercise the harness with no live app.
 
 ### Layout
@@ -37,7 +38,7 @@ tests/
 │       ├── base.py        # Transport interface
 │       ├── mock.py        # runnable today
 │       ├── unary.py       # runSession over REST - LIVE (validates the real agent)
-│       └── bidi.py        # streamRunSession   (skeleton, TODO(confirm))
+│       └── stream.py      # stream_run_session over gRPC - LIVE (server-streaming)
 └── requirements.txt
 ```
 
@@ -45,7 +46,7 @@ tests/
 ```yaml
 name: order-status-happy          # unique id
 description: User asks order status; agent retrieves and reports it
-transport: unary                  # unary | bidi | mock  (optional; default from config)
+transport: unary                  # unary | stream | mock  (optional; default from config)
 
 session:
   variables:                      # data variables handed to the agent at session start
