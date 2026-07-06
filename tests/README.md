@@ -14,6 +14,22 @@ python -m runner --case hello-world      # just the live agent case
 > `unary` uses stdlib only; `pip install -r requirements.txt` (google-cloud-ces) is needed for the
 > `stream` transport.
 
+## Call reporting — what happened to one call
+Pull the **server-side CES conversation trace** for a single call and render a per-call report
+(overview, transcript interleaved with tool calls/responses, guardrail decisions, outcome). Driven
+by `config/config.json`; auth is your active gcloud account. Stdlib only.
+
+```powershell
+./scripts/call-report.ps1 -List [-Limit 20]        # recent calls, newest first
+./scripts/call-report.ps1 -Id test-1a2b3c4d5e6f    # rendered report to console
+./scripts/call-report.ps1 -Id <id> -Out report.md  # ...or to a markdown file
+./scripts/call-report.ps1 -Id <id> -Raw            # raw conversation JSON
+```
+
+`<id>` is the conversation id — the **same `test-<hex>` session id the harness mints**, so you can
+jump straight from a test call to its full trace. Module: `tests/runner/conversations.py`
+(`list` / `get` / `report`). This reads the CES `conversations` API — the agent's own server-side log.
+
 ## Layout
 ```
 tests/
