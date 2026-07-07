@@ -23,6 +23,9 @@ definitions under `app/` and validate with the test harness.
 5. **`app/` mirrors the live platform.** Files under `app/` are faithful exports of the deployed
    app — don't "improve" them; sync them (see `export-app.ps1` / `push-app.ps1`). Design intent
    goes in `design/`, not by editing exports.
+6. **Confirm before destructive actions. Dry-run wherever possible.** Prefer a preview/plan first
+   (e.g. `push-app.ps1` without `-Apply`); only mutate live resources or discard work after showing
+   what will change and getting the go-ahead.
 
 ---
 
