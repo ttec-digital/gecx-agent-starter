@@ -145,12 +145,15 @@ def format_report(conv: dict[str, Any]) -> str:
         for m in t.get("messages", []):
             role = m.get("role", "?")
             is_user = role == "user"
+            # role carries the speaker: "user" for the caller, otherwise the agent's name. Voice
+            # turns arrive as `transcript` (STT/TTS) rather than `text`, so label both by role -
+            # not every transcript chunk is the user.
+            who = "USER" if is_user else f"AGENT [{role}]"
             for ch in m.get("chunks", []):
                 if ch.get("text"):
-                    who = "USER" if is_user else f"AGENT [{role}]"
                     out.append(f"- **{who}:** {ch['text']}")
                 elif ch.get("transcript"):
-                    out.append(f"- **USER (speech):** {ch['transcript']}")
+                    out.append(f"- **{who} (speech):** {ch['transcript']}")
                 elif "toolCall" in ch:
                     tc = ch["toolCall"] or {}
                     out.append(f"    - call `{tc.get('displayName', '?')}`({_compact(tc.get('args', {}), 140)})")
@@ -189,8 +192,9 @@ def format_report(conv: dict[str, Any]) -> str:
         for m in t.get("messages", []):
             if m.get("role") != "user":
                 for ch in m.get("chunks", []):
-                    if ch.get("text"):
-                        final_line = ch["text"]
+                    # agent lines are `text` on chat, `transcript` on voice - accept either
+                    if ch.get("text") or ch.get("transcript"):
+                        final_line = ch.get("text") or ch.get("transcript")
     out.append("## Outcome")
     if final_line:
         out.append(f"- Final agent line: {final_line}")
